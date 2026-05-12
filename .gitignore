@@ -1,0 +1,34 @@
+# build output
+build/
+bin/*
+!bin/test.conf
+
+lib/
+
+# generated runtime files
+core
+core.*
+*.out
+*.log
+
+# object / binary files
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+# editor / local tooling
+.vscode/
+.idea/
+.codex/
+.agents/
+
+# cmake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# third-party dependency
+muduo1/
