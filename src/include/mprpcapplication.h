@@ -1,5 +1,8 @@
 #pragma once
 #include "mprpcconfig.h"
+#include "rpccontroller.h"
+#include "mprpcchannel.h"
+
 //mprpc框架的初始化类 单例
 class MprpcApplication
 {

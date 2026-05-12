@@ -45,6 +45,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     std::string args_str;
     // 将请求参数序列化为字符串
     if(!request->SerializeToString(&args_str)){
+        controller->SetFailed("request serialize error!");
         std::cout << "request serialize error!" << std::endl;
         return;
     }
@@ -58,6 +59,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     std::string rpc_header_str;
     uint32_t header_size = 0;
     if(!rpc_header.SerializeToString(&rpc_header_str)){
+        controller->SetFailed("rpc header serialize error!");
         std::cout << "rpc header serialize error!" << std::endl;
         return;
     }else{
@@ -79,13 +81,14 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     std::cout << "=========================================" << std::endl;
 
     // 使用TCP编程 完成rpc方法的远程调用  需要知道rpc服务提供方的ip地址和端口号
-    // 智能指针 动态分配一个socket对象，自动释放
     
     int clientfd = socket(AF_INET,SOCK_STREAM,0);
     if(clientfd == -1){
+        controller->SetFailed("create socket error!");
         std::cout << "create socket error!" << std::endl;
-        exit(EXIT_FAILURE);
+        return;
     }
+    // RAII 
     FdGuard fd_guard(clientfd);
 
     std::string ip = MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
@@ -97,26 +100,30 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
     server_addr.sin_addr.s_addr = inet_addr(ip.c_str());
     // 连接rpc服务提供方
     if(-1 == connect(clientfd,(struct sockaddr*)&server_addr,sizeof(server_addr))){
+        controller->SetFailed("connect server error!");
         std::cout << "connect server error!" << std::endl;
-        exit(EXIT_FAILURE);
+        return;
     }
     // 发送rpc请求
     if(-1 == send(clientfd,send_rpc_str.c_str(),send_rpc_str.size(),0)){
+        controller->SetFailed("send rpc request error!");
         std::cout << "send rpc request error!" << std::endl;
-        exit(EXIT_FAILURE);
+        return;
     }
     // 接受rpc响应
     char recv_buf[1024] = {0};
     int recv_size = 0;
     if(-1 == (recv_size = recv(clientfd,recv_buf,sizeof(recv_buf),0))){
+        controller->SetFailed("recv rpc response error!");
         std::cout << "recv rpc response error!" << std::endl;
-        exit(EXIT_FAILURE);
+        return;
     }
 
     // std::string response_str(recv_buf, 0, recv_size);// response parse error!
 
     // 将rpc响应反序列化为response对象
     if(!response->ParseFromArray(recv_buf, recv_size)){
+        controller->SetFailed("response parse error!");
         std::cout << "response parse error!"  << std::endl;
         return;
     }
