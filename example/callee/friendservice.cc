@@ -3,7 +3,7 @@
 #include <vector>
 #include "mprpcapplication.h"
 #include "rpcprovider.h"
-
+#include "logger.h"
 class FriendService : public fixbug::FriendServiceRpc
 {
 public:
@@ -39,6 +39,8 @@ public:
 
 int main(int argc, char** argv){
     //调用框架初始化操作
+    LOG_INFO("Initializing MprpcApplication");
+    LOG_ERR("Failed to initialize MprpcApplication");
     MprpcApplication::Init(argc,argv);
 
     //把FriendService对象发布到rpc节点上  让rpc框架来调用这个对象提供的GetFriendList方法

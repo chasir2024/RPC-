@@ -8,6 +8,7 @@ Logger& Logger::getInstance(){
     static Logger logger;
     return logger;
 }
+
 //从日志缓冲区中取出日志并写入到日志文件中
 Logger::Logger(){
     //启动一个线程专门负责日志的写入
@@ -31,6 +32,8 @@ Logger::Logger(){
             fclose(pf);
         }
     });
+    //设置线程分离，主线程结束后日志线程也会结束
+    log_thread.detach();
 }
 // 设置日志级别
 void Logger::setloglevel(LogLevel level){
@@ -42,3 +45,4 @@ void Logger::log(LogLevel level, const std::string& message){
         logs_.Push(message);
     }
 }
+

@@ -28,10 +28,28 @@ private:
 #define LOG_INFO(logmsgformat, ...) \
     do \
     { \
-        Logger::getInstance().log(INFO, "This is an info log."); \
-        Logger::setloglevel(INFO); \
+        Logger::getInstance().setloglevel(INFO); \
         char c[1024] = {0}; \
         snprintf(c,1024,logmsgformat,##__VA_ARGS__); \
+        Logger::getInstance().log(INFO, c); \
     } while (0);
 
+#define LOG_WARNING(logmsgformat, ...) \
+    do \
+    { \
+        Logger::getInstance().setloglevel(WARNING); \
+        char c[1024] = {0}; \
+        snprintf(c,1024,logmsgformat,##__VA_ARGS__); \
+        Logger::getInstance().log(WARNING, c); \
+    } while (0);
 
+#define LOG_ERROR(logmsgformat, ...) \
+    do \
+    { \
+        Logger::getInstance().setloglevel(ERROR); \
+        char c[1024] = {0}; \
+        snprintf(c,1024,logmsgformat,##__VA_ARGS__); \
+        Logger::getInstance().log(ERROR, c); \
+    } while (0);
+
+#define LOG_ERR(logmsgformat, ...) LOG_ERROR(logmsgformat, ##__VA_ARGS__)
